@@ -1,0 +1,46 @@
+diff --git a/plugins/catalog/src/api/CatalogClient.test.ts b/plugins/catalog/src/api/CatalogClient.test.ts
+index a1a1a1a..b2b2b2b 100644
+--- a/plugins/catalog/src/api/CatalogClient.test.ts
++++ b/plugins/catalog/src/api/CatalogClient.test.ts
+@@ -14,12 +14,10 @@ import { CatalogClient } from './CatalogClient';
+
+ describe('CatalogClient', () => {
+   beforeEach(() => {
+-    server.use(
+-      rest.get(`${mockApiOrigin}/entities`, (_, res, ctx) =>
+-        res(ctx.json(defaultResponse)),
+-      ),
+-    );
++    global.fetch = jest.fn().mockResolvedValue({
++      ok: true,
++      json: async () => defaultResponse,
++    });
+   });
+diff --git a/plugins/catalog/src/api/EntityClient.test.ts b/plugins/catalog/src/api/EntityClient.test.ts
+index c3c3c3c..d4d4d4d 100644
+--- a/plugins/catalog/src/api/EntityClient.test.ts
++++ b/plugins/catalog/src/api/EntityClient.test.ts
+@@ -9,9 +9,8 @@ import { EntityClient } from './EntityClient';
+ describe('EntityClient', () => {
+   beforeEach(() => {
+-    server.use(
+-      rest.get(`${mockApiOrigin}/entities/by-name`, handler),
+-    );
++    jest.spyOn(global, 'fetch').mockResolvedValue(
++      new Response(JSON.stringify(entityFixture)),
++    );
+   });
+diff --git a/plugins/catalog/src/api/LocationClient.test.ts b/plugins/catalog/src/api/LocationClient.test.ts
+index e5e5e5e..f6f6f6f 100644
+--- a/plugins/catalog/src/api/LocationClient.test.ts
++++ b/plugins/catalog/src/api/LocationClient.test.ts
+@@ -11,9 +11,8 @@ describe('LocationClient', () => {
+   beforeEach(() => {
+-    server.use(
+-      rest.post(`${mockApiOrigin}/locations`, locationHandler),
+-    );
++    global.fetch = jest.fn().mockResolvedValue({
++      ok: true,
++      json: async () => locationFixture,
++    });
+   });

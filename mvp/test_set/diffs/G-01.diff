@@ -1,0 +1,22 @@
+diff --git a/packages/backend-defaults/package.json b/packages/backend-defaults/package.json
+index 444cccc..555dddd 100644
+--- a/packages/backend-defaults/package.json
++++ b/packages/backend-defaults/package.json
+@@ -33,6 +33,7 @@
+   "dependencies": {
+     "@backstage/backend-plugin-api": "workspace:^",
++    "node-fetch": "^2.7.0",
+     "raw-body": "^2.4.1"
+   },
+diff --git a/packages/backend-defaults/src/entrypoints/discovery/proxyFetch.ts b/packages/backend-defaults/src/entrypoints/discovery/proxyFetch.ts
+index 666eeee..777ffff 100644
+--- a/packages/backend-defaults/src/entrypoints/discovery/proxyFetch.ts
++++ b/packages/backend-defaults/src/entrypoints/discovery/proxyFetch.ts
+@@ -0,0 +1,10 @@
++import fetch from 'node-fetch';
++import { HttpsProxyAgent } from 'https-proxy-agent';
++
++// Native fetch (undici) does not honor HTTPS_PROXY agents for this call path.
++// See issue #24988. Scoped to discovery only; remove when undici supports it.
++export const proxyFetch = (url: string) =>
++  fetch(url, { agent: new HttpsProxyAgent(process.env.HTTPS_PROXY!) });

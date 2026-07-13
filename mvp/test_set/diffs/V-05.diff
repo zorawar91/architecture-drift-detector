@@ -1,0 +1,11 @@
+diff --git a/packages/core-components/src/components/Table/columns.ts b/packages/core-components/src/components/Table/columns.ts
+index abcd123..efgh456 100644
+--- a/packages/core-components/src/components/Table/columns.ts
++++ b/packages/core-components/src/components/Table/columns.ts
+@@ -22,3 +22,7 @@ export function createColumn(options: ColumnOptions): TableColumn {
+   return { ...defaults, ...options };
+ }
++
++// Convenience re-exports so column consumers get the formatters too
++export { formatCell, formatHeader } from './formatters';
++export type { CellFormatter } from './formatters';

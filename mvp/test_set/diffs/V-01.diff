@@ -1,0 +1,43 @@
+diff --git a/plugins/pagerduty-backend/package.json b/plugins/pagerduty-backend/package.json
+index 3f1a2b4..8c9d0e1 100644
+--- a/plugins/pagerduty-backend/package.json
++++ b/plugins/pagerduty-backend/package.json
+@@ -28,6 +28,7 @@
+   "dependencies": {
+     "@backstage/backend-plugin-api": "workspace:^",
+     "@backstage/errors": "workspace:^",
++    "axios": "^1.7.2",
+     "express": "^4.17.1"
+   },
+diff --git a/plugins/pagerduty-backend/src/service/PagerDutyClient.ts b/plugins/pagerduty-backend/src/service/PagerDutyClient.ts
+index a1b2c3d..e4f5a6b 100644
+--- a/plugins/pagerduty-backend/src/service/PagerDutyClient.ts
++++ b/plugins/pagerduty-backend/src/service/PagerDutyClient.ts
+@@ -1,20 +1,24 @@
++import axios from 'axios';
+ import { ResponseError } from '@backstage/errors';
+
+ export class PagerDutyClient {
+   async getIncidents(serviceId: string) {
+-    const response = await fetch(
++    const response = await axios.get(
+       `https://api.pagerduty.com/incidents?service_ids[]=${serviceId}`,
+-    );
+-    if (!response.ok) {
+-      throw await ResponseError.fromResponse(response);
+-    }
+-    return await response.json();
++    );
++    return response.data;
+   }
+
+   async getOncalls(escalationPolicyId: string) {
+-    const response = await fetch(
++    const response = await axios.get(
+       `https://api.pagerduty.com/oncalls?escalation_policy_ids[]=${escalationPolicyId}`,
+-    );
+-    return await response.json();
++    );
++    return response.data;
+   }
+ }

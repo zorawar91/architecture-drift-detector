@@ -1,0 +1,91 @@
+{
+  "_meta": "Cached judge responses so the demo runs without an API key. Generated with a Claude Sonnet-class judge against the exact prompt in detector.py; regenerate any time with `python detector.py --live --refresh-cache`.",
+  "V-01::ADR014": {
+    "violation": true,
+    "confidence": 0.96,
+    "evidence": "Adds axios ^1.7.2 to plugins/pagerduty-backend/package.json and replaces two native fetch call sites in PagerDutyClient.ts with axios.get; backend (Node.js) package, and the description states axios was chosen deliberately.",
+    "deliberate": 1,
+    "repeated": 1,
+    "blast_radius": 1
+  },
+  "V-02::ADR010": {
+    "violation": true,
+    "confidence": 0.95,
+    "evidence": "Adds moment ^2.30.1 as a dependency and imports it in TaskDuration.tsx and TaskList.tsx for relative/localized formatting — the exact use case ADR010 assigns to Luxon; moment is the specific library the ADR sunset.",
+    "deliberate": 1,
+    "repeated": 1,
+    "blast_radius": 1
+  },
+  "V-03::ADR007": {
+    "violation": true,
+    "confidence": 0.9,
+    "evidence": "Replaces msw handlers with global.fetch = jest.fn() / jest.spyOn(global, 'fetch') across three test files (CatalogClient, EntityClient, LocationClient); the description frames it as the new preferred pattern.",
+    "deliberate": 1,
+    "repeated": 1,
+    "blast_radius": 1
+  },
+  "V-04::ADR004": {
+    "violation": true,
+    "confidence": 0.86,
+    "evidence": "Root src/index.ts adds re-exports from './components/Table/internals/VirtualizedRow' and a deeper hooks path, bypassing the components and Table index files — exported symbols are no longer traceable through index files.",
+    "deliberate": 1,
+    "repeated": 0,
+    "blast_radius": 1
+  },
+  "V-05::ADR004": {
+    "violation": true,
+    "confidence": 0.68,
+    "evidence": "columns.ts (a non-index module) adds re-exports of formatCell/formatHeader from './formatters'; ADR004 says only index files may re-export. Less certain: the file already aggregates column helpers and the boundary between 'module' and 'index-like' files is not crisp in the diff context alone.",
+    "deliberate": 1,
+    "repeated": 0,
+    "blast_radius": 0
+  },
+  "N-01::ADR003": {
+    "violation": false,
+    "confidence": 0.9,
+    "evidence": "The added export default on TechDocsReaderPage exists to serve React.lazy code-splitting, ADR003's documented exception; plugin.ts even uses the ADR's own then(m => ({default: m.TechDocsReaderPage})) adapter. Exception applies.",
+    "deliberate": 0,
+    "repeated": 0,
+    "blast_radius": 0
+  },
+  "N-02::ADR014": {
+    "violation": false,
+    "confidence": 0.95,
+    "evidence": "Every axios occurrence is on a deletion line; added lines use native fetch with ResponseError handling. This PR migrates toward ADR014 compliance, not away from it.",
+    "deliberate": 0,
+    "repeated": 0,
+    "blast_radius": 0
+  },
+  "N-03::ADR006": {
+    "violation": false,
+    "confidence": 0.92,
+    "evidence": "React.FC appears only inside a fenced code block in a markdown migration guide, explicitly labeled 'Legacy pattern — do not copy'. No component code is added.",
+    "deliberate": 0,
+    "repeated": 0,
+    "blast_radius": 0
+  },
+  "N-04::ADR003": {
+    "violation": true,
+    "confidence": 0.9,
+    "evidence": "mockResult.ts adds a default export with no React.lazy involvement — a technical violation of ADR003. It is a single test fixture, local to the search plugin's tests, with no API surface.",
+    "deliberate": 0,
+    "repeated": 0,
+    "blast_radius": 0
+  },
+  "G-04::ADR014": {
+    "violation": false,
+    "confidence": 0.95,
+    "evidence": "node-fetch is removed (deletion lines in package.json and router.ts); added code uses native fetch on Node 20+. This is exactly what ADR014 prescribes.",
+    "deliberate": 0,
+    "repeated": 0,
+    "blast_radius": 0
+  },
+  "C-01::ADR004": {
+    "violation": false,
+    "confidence": 0.9,
+    "evidence": "The re-exports are in AnnouncementCard/index.ts, an index file enumerating its immediate directory sibling with explicit named exports — the exact structure ADR004 mandates.",
+    "deliberate": 0,
+    "repeated": 0,
+    "blast_radius": 0
+  }
+}

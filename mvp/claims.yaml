@@ -1,0 +1,153 @@
+# Structured, checkable claims extracted from real Backstage ADRs
+# (https://github.com/backstage/backstage/tree/master/docs/architecture-decisions)
+#
+# Each claim is the actual rule buried in the ADR prose — not the discussion around it.
+# `watch_patterns` are cheap regex pre-filters that decide whether a diff is even
+# worth sending to the LLM for judgment (cost control + noise control).
+# `vigilance_rank` = how much I'd actually want to know about a violation (1 = most).
+# `author` fields are illustrative handles for the author-override guardrail demo;
+# the fabricated test PRs reference them.
+
+claims:
+  - id: ADR014
+    title: Use native fetch in Node.js code
+    source: docs/architecture-decisions/adr014-use-fetch.md
+    status: active
+    author: "@platform-lead"
+    claim: >
+      All code executed in Node.js (backend and CLIs) must use native fetch for
+      HTTP data fetching. Frontend code must use fetchApiRef. Third-party HTTP
+      client packages (node-fetch, axios, got, superagent, request) must not be
+      introduced.
+    violation_looks_like:
+      - A new import of axios / got / node-fetch / superagent in a backend package
+      - A new dependency on a third-party HTTP client in package.json
+      - Frontend code calling a raw HTTP client instead of fetchApiRef
+    exceptions:
+      - cross-fetch as a type/mocking dependency in isomorphic packages
+    blast_radius: high   # dependency sprawl, security surface, bundle size
+    vigilance_rank: 1
+    watch_patterns:
+      - "axios"
+      - "node-fetch"
+      - "\\bgot\\b"
+      - "superagent"
+      - "isomorphic-fetch"
+
+  - id: ADR010
+    title: Use Luxon as the only date library
+    source: docs/architecture-decisions/adr010-luxon-date-library.md
+    status: active
+    author: "@core-maintainer"
+    claim: >
+      Luxon is the standard date library. New code must not introduce moment,
+      dayjs, date-fns, or other date libraries for manipulation/formatting that
+      native Date cannot easily do.
+    violation_looks_like:
+      - moment/dayjs/date-fns added to a package.json
+      - New imports of a non-Luxon date library in source code
+    exceptions: []
+    blast_radius: high   # bundle size, two APIs to learn, the exact sprawl the ADR consolidated
+    vigilance_rank: 2
+    watch_patterns:
+      - "moment"
+      - "dayjs"
+      - "date-fns"
+
+  - id: ADR007
+    title: Mock HTTP requests with msw, not manual fetch mocks
+    source: docs/architecture-decisions/adr007-use-msw-to-mock-service-requests.md
+    status: active
+    author: "@testing-wg"
+    claim: >
+      Any fetch or XMLHttpRequest in tests must be mocked using msw, not by
+      stubbing fetch directly (jest.fn, jest.spyOn on global.fetch, manual
+      fetch replacement).
+    violation_looks_like:
+      - jest.spyOn(global, 'fetch') or global.fetch = jest.fn() in new test code
+      - New manual mock modules replacing fetch
+    exceptions:
+      - Tests of fetch-wrapping utilities themselves where msw is circular
+    blast_radius: medium  # test-infra divergence, flaky coverage
+    vigilance_rank: 3
+    watch_patterns:
+      - "global.fetch"
+      - "fetch\\s*=\\s*jest\\.fn"
+      - "spyOn\\((global|window),\\s*['\"]fetch"
+      - "fetchMock"
+
+  - id: ADR004
+    title: Traceable module export structure
+    source: docs/architecture-decisions/adr004-module-export-structure.md
+    status: active
+    author: "@platform-lead"
+    claim: >
+      Every exported symbol must be traceable through index files down to
+      src/index.ts. Only index files may re-export, each index file re-exports
+      only its immediate directory children, and the root index must not
+      re-export deep paths that bypass intermediate index files.
+    violation_looks_like:
+      - Root index.ts re-exporting from a deep path (./components/X/SubY)
+      - A non-index module containing re-export statements
+    exceptions:
+      - Internal deep imports (not re-exports) are discouraged but allowed
+    blast_radius: medium  # public API surface becomes untraceable
+    vigilance_rank: 4
+    watch_patterns:
+      - "export \\* from"
+      - "export \\{[^}]*\\} from"
+
+  - id: ADR003
+    title: Avoid default exports
+    source: docs/architecture-decisions/adr003-avoid-default-exports.md
+    status: active
+    author: "@core-maintainer"
+    claim: >
+      New code must use named exports, not default exports, except where
+      required (React.lazy modules).
+    violation_looks_like:
+      - New `export default` statements in added lines
+    exceptions:
+      - React.lazy dynamic-import modules
+    blast_radius: low   # lint-able, mechanically fixable; a judgment layer should mostly stay out of the linter's lane
+    vigilance_rank: 6
+    watch_patterns:
+      - "export default"
+
+  - id: ADR006
+    title: Avoid React.FC and React.SFC
+    source: docs/architecture-decisions/adr006-avoid-react-fc.md
+    status: active
+    author: "@frontend-wg"
+    claim: >
+      New components must not be typed with React.FC or React.SFC; type props
+      explicitly (or PropsWithChildren).
+    violation_looks_like:
+      - New component declarations using React.FC / FC< / React.SFC
+    exceptions: []
+    blast_radius: low
+    vigilance_rank: 5
+    watch_patterns:
+      - "React\\.FC"
+      - "React\\.SFC"
+      - ":\\s*FC<"
+
+  # Kept in the registry deliberately: a naive detector would still enforce this.
+  # ADR013 was superseded by ADR014 — the detector must never flag against it.
+  - id: ADR013
+    title: "[SUPERSEDED] Use node-fetch in backend packages"
+    source: docs/architecture-decisions/adr013-use-node-fetch.md
+    status: superseded
+    superseded_by: ADR014
+    author: "@platform-lead"
+    claim: >
+      (No longer applies.) Backend packages should use node-fetch for HTTP
+      data fetching.
+    violation_looks_like:
+      - (Would have been) backend code using native fetch instead of node-fetch
+    exceptions: []
+    blast_radius: none
+    vigilance_rank: 99
+    watch_patterns:
+      - "node-fetch"
+      - "await fetch\\("

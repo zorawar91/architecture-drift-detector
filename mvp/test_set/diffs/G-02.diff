@@ -1,0 +1,13 @@
+diff --git a/plugins/kubernetes/src/api/KubernetesProxy.test.ts b/plugins/kubernetes/src/api/KubernetesProxy.test.ts
+index 888aaaa..999bbbb 100644
+--- a/plugins/kubernetes/src/api/KubernetesProxy.test.ts
++++ b/plugins/kubernetes/src/api/KubernetesProxy.test.ts
+@@ -12,9 +12,12 @@ describe('KubernetesProxy', () => {
+   beforeEach(() => {
+-    server.use(rest.get(`${origin}/api/v1/pods`, podsHandler));
++    // msw 1.x cannot intercept the retry path here (see incident timeline);
++    // stubbing fetch directly to get the regression test out with the fix.
++    global.fetch = jest.fn().mockResolvedValue(
++      new Response(JSON.stringify(podListFixture)),
++    );
+   });

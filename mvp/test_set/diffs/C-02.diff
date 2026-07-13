@@ -1,0 +1,40 @@
+diff --git a/plugins/announcements-backend/src/service/AnnouncementsClient.ts b/plugins/announcements-backend/src/service/AnnouncementsClient.ts
+index 909090a..020202b 100644
+--- a/plugins/announcements-backend/src/service/AnnouncementsClient.ts
++++ b/plugins/announcements-backend/src/service/AnnouncementsClient.ts
+@@ -0,0 +1,14 @@
++import { ResponseError } from '@backstage/errors';
++
++export class AnnouncementsClient {
++  constructor(private readonly baseUrl: string) {}
++
++  async list() {
++    const response = await fetch(`${this.baseUrl}/announcements`);
++    if (!response.ok) {
++      throw await ResponseError.fromResponse(response);
++    }
++    return await response.json();
++  }
++}
+diff --git a/plugins/announcements-backend/src/service/AnnouncementsClient.test.ts b/plugins/announcements-backend/src/service/AnnouncementsClient.test.ts
+index 131313c..242424d 100644
+--- a/plugins/announcements-backend/src/service/AnnouncementsClient.test.ts
++++ b/plugins/announcements-backend/src/service/AnnouncementsClient.test.ts
+@@ -0,0 +1,16 @@
++import { setupServer } from 'msw/node';
++import { rest } from 'msw';
++import { AnnouncementsClient } from './AnnouncementsClient';
++
++const server = setupServer(
++  rest.get('http://localhost/announcements', (_, res, ctx) =>
++    res(ctx.json([{ id: '1', title: 'Hello' }])),
++  ),
++);
++
++beforeAll(() => server.listen());
++afterAll(() => server.close());
++
++it('lists announcements', async () => {
++  const client = new AnnouncementsClient('http://localhost');
++  await expect(client.list()).resolves.toHaveLength(1);
++});

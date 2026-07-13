@@ -1,0 +1,39 @@
+diff --git a/plugins/scaffolder/package.json b/plugins/scaffolder/package.json
+index 11aa22b..33cc44d 100644
+--- a/plugins/scaffolder/package.json
++++ b/plugins/scaffolder/package.json
+@@ -41,6 +41,7 @@
+   "dependencies": {
+     "@backstage/core-components": "workspace:^",
+     "@backstage/core-plugin-api": "workspace:^",
++    "moment": "^2.30.1",
+     "react-use": "^17.2.4"
+   },
+diff --git a/plugins/scaffolder/src/components/TaskPage/TaskDuration.tsx b/plugins/scaffolder/src/components/TaskPage/TaskDuration.tsx
+index 55ee66f..77aa88b 100644
+--- a/plugins/scaffolder/src/components/TaskPage/TaskDuration.tsx
++++ b/plugins/scaffolder/src/components/TaskPage/TaskDuration.tsx
+@@ -1,11 +1,12 @@
++import moment from 'moment';
+ import React from 'react';
+
+ export const TaskDuration = (props: { startedAt: string; endedAt?: string }) => {
+-  const started = new Date(props.startedAt);
++  const started = moment(props.startedAt);
+   return (
+     <span>
+-      {started.toLocaleString()}
++      {started.fromNow()}
+     </span>
+   );
+ };
+diff --git a/plugins/scaffolder/src/components/TaskPage/TaskList.tsx b/plugins/scaffolder/src/components/TaskPage/TaskList.tsx
+index 99bb00c..11dd22e 100644
+--- a/plugins/scaffolder/src/components/TaskPage/TaskList.tsx
++++ b/plugins/scaffolder/src/components/TaskPage/TaskList.tsx
+@@ -8,7 +8,8 @@ import React from 'react';
++import moment from 'moment';
+
+ export const formatTaskTimestamp = (ts: string) =>
+-  new Date(ts).toLocaleString();
++  moment(ts).format('MMM D, YYYY h:mm A');

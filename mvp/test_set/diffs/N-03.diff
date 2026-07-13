@@ -1,0 +1,25 @@
+diff --git a/docs/plugins/migrating-from-react-fc.md b/docs/plugins/migrating-from-react-fc.md
+index 999eeee..888ffff 100644
+--- a/docs/plugins/migrating-from-react-fc.md
++++ b/docs/plugins/migrating-from-react-fc.md
+@@ -0,0 +1,24 @@
++# Migrating away from React.FC
++
++Per ADR006, new components should not use `React.FC`. If you have legacy
++components that look like this:
++
++```tsx
++/* Legacy pattern — do not copy */
++const MyCard: React.FC<MyCardProps> = ({ title, children }) => (
++  <Card title={title}>{children}</Card>
++);
++```
++
++rewrite them to type props explicitly:
++
++```tsx
++type MyCardProps = PropsWithChildren<{ title: string }>;
++const MyCard = ({ title, children }: MyCardProps) => (
++  <Card title={title}>{children}</Card>
++);
++```

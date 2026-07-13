@@ -1,0 +1,29 @@
+diff --git a/plugins/announcements/src/components/AnnouncementCard/AnnouncementCard.tsx b/plugins/announcements/src/components/AnnouncementCard/AnnouncementCard.tsx
+index 121212a..343434b 100644
+--- a/plugins/announcements/src/components/AnnouncementCard/AnnouncementCard.tsx
++++ b/plugins/announcements/src/components/AnnouncementCard/AnnouncementCard.tsx
+@@ -0,0 +1,21 @@
++import React from 'react';
++import { DateTime } from 'luxon';
++import { InfoCard } from '@backstage/core-components';
++
++type AnnouncementCardProps = {
++  title: string;
++  publishedAt: string;
++};
++
++export const AnnouncementCard = ({ title, publishedAt }: AnnouncementCardProps) => {
++  const published = DateTime.fromISO(publishedAt).toRelative();
++  return (
++    <InfoCard title={title}>
++      <span>{published}</span>
++    </InfoCard>
++  );
++};
+diff --git a/plugins/announcements/src/components/AnnouncementCard/index.ts b/plugins/announcements/src/components/AnnouncementCard/index.ts
+index 565656c..787878d 100644
+--- a/plugins/announcements/src/components/AnnouncementCard/index.ts
++++ b/plugins/announcements/src/components/AnnouncementCard/index.ts
+@@ -0,0 +1,2 @@
++export { AnnouncementCard } from './AnnouncementCard';
++export type { AnnouncementCardProps } from './AnnouncementCard';

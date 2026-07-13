@@ -1,0 +1,10 @@
+diff --git a/packages/core-components/src/index.ts b/packages/core-components/src/index.ts
+index 1234abc..5678def 100644
+--- a/packages/core-components/src/index.ts
++++ b/packages/core-components/src/index.ts
+@@ -18,3 +18,6 @@ export * from './layout';
+ export * from './components';
+ export * from './hooks';
++// Fast path for the new table internals so consumers can use them directly
++export { VirtualizedRow } from './components/Table/internals/VirtualizedRow';
++export { useRowVirtualizer } from './components/Table/internals/hooks/useRowVirtualizer';

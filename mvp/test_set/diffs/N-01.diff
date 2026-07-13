@@ -1,0 +1,19 @@
+diff --git a/plugins/techdocs/src/plugin.ts b/plugins/techdocs/src/plugin.ts
+index aaa1111..bbb2222 100644
+--- a/plugins/techdocs/src/plugin.ts
++++ b/plugins/techdocs/src/plugin.ts
+@@ -30,6 +30,11 @@ import { techdocsApiRef } from './api';
++// Lazy-loaded route component. React.lazy requires a default export shape,
++// which is the documented exception in ADR003; we adapt the named export.
++const LazyTechDocsReaderPage = React.lazy(() =>
++  import('./reader/TechDocsReaderPage').then(m => ({ default: m.TechDocsReaderPage })),
++);
+diff --git a/plugins/techdocs/src/reader/TechDocsReaderPage.tsx b/plugins/techdocs/src/reader/TechDocsReaderPage.tsx
+index ccc3333..ddd4444 100644
+--- a/plugins/techdocs/src/reader/TechDocsReaderPage.tsx
++++ b/plugins/techdocs/src/reader/TechDocsReaderPage.tsx
+@@ -55,3 +55,5 @@ export const TechDocsReaderPage = (props: TechDocsReaderPageProps) => {
+   );
+ };
++
++export default TechDocsReaderPage;

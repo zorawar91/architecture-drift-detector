@@ -1,0 +1,26 @@
+diff --git a/plugins/proxy-backend/src/service/router.ts b/plugins/proxy-backend/src/service/router.ts
+index eee5555..fff4444 100644
+--- a/plugins/proxy-backend/src/service/router.ts
++++ b/plugins/proxy-backend/src/service/router.ts
+@@ -1,12 +1,11 @@
+-import fetch from 'node-fetch';
+ import { ResponseError } from '@backstage/errors';
+
+ export async function checkUpstream(url: string) {
+-  const response = await fetch(url);
++  const response = await fetch(url); // native fetch, Node 20+
+   if (!response.ok) {
+     throw await ResponseError.fromResponse(response);
+   }
+   return await response.json();
+ }
+diff --git a/plugins/proxy-backend/package.json b/plugins/proxy-backend/package.json
+index 000aaaa..111bbbb 100644
+--- a/plugins/proxy-backend/package.json
++++ b/plugins/proxy-backend/package.json
+@@ -24,7 +24,6 @@
+   "dependencies": {
+     "@backstage/backend-plugin-api": "workspace:^",
+-    "node-fetch": "^2.7.0",
+     "express": "^4.17.1"
+   },

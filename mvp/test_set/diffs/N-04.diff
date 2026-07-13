@@ -1,0 +1,16 @@
+diff --git a/plugins/search/src/components/__fixtures__/mockResult.ts b/plugins/search/src/components/__fixtures__/mockResult.ts
+index 222aaaa..333bbbb 100644
+--- a/plugins/search/src/components/__fixtures__/mockResult.ts
++++ b/plugins/search/src/components/__fixtures__/mockResult.ts
+@@ -0,0 +1,12 @@
++// Test fixture: a canned search result used by SearchResultList tests
++const mockResult = {
++  type: 'software-catalog',
++  document: {
++    title: 'example-service',
++    location: '/catalog/default/component/example-service',
++  },
++  rank: 1,
++};
++
++export default mockResult;

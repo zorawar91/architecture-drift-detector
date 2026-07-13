@@ -1,0 +1,266 @@
+# Test set manifest: 15 PR-style diffs with metadata and ground-truth labels.
+#
+# Diffs are FABRICATED in the style of the Backstage codebase (the ADRs are real;
+# the PRs are constructed to exercise specific detector behaviors — the project
+# guide explicitly sanctions this). Authors are fictional handles.
+#
+# ground_truth.decision: FLAG   = a well-calibrated system should interrupt an engineer
+#                        SILENT = a well-calibrated system must stay quiet
+# ground_truth.category: violation | noise-lookalike | guardrail | clean
+
+prs:
+  - id: V-01
+    title: "Add PagerDuty incident sync to pagerduty-backend"
+    author: "@new-contributor-42"
+    labels: []
+    description: >
+      Adds incident and oncall fetching for the PagerDuty integration.
+      Used axios since it handles JSON parsing out of the box.
+    diff_file: diffs/V-01.diff
+    ground_truth:
+      decision: FLAG
+      category: violation
+      claim: ADR014
+      why: >
+        New axios dependency + two call sites in a backend package. Deliberate
+        (stated in description), repeated within the PR, high blast radius
+        (new HTTP client dependency — exactly what ADR014 consolidated away).
+
+  - id: V-02
+    title: "Show relative timestamps on scaffolder task page"
+    author: "@frontend-dev-7"
+    labels: []
+    description: >
+      Task timestamps now render as "2 hours ago" and localized formats.
+    diff_file: diffs/V-02.diff
+    ground_truth:
+      decision: FLAG
+      category: violation
+      claim: ADR010
+      why: >
+        Adds moment — the exact library ADR010 sunset — as a new dependency
+        with two usage sites. High blast radius: bundle size, second date API,
+        and moment is itself deprecated upstream.
+
+  - id: V-03
+    title: "Simplify catalog client tests"
+    author: "@backend-dev-3"
+    labels: []
+    description: >
+      msw setup was verbose; replaced with direct fetch stubs across the
+      catalog client test suites. Less boilerplate per test.
+    diff_file: diffs/V-03.diff
+    ground_truth:
+      decision: FLAG
+      category: violation
+      claim: ADR007
+      why: >
+        Systematically replaces msw with manual fetch stubs across three test
+        files — deliberate and repeated. Not a one-off: it establishes a
+        divergent test pattern others will copy.
+
+  - id: V-04
+    title: "Expose table virtualization internals for perf-sensitive consumers"
+    author: "@perf-hacker"
+    labels: []
+    description: >
+      Consumers building custom tables need direct access to the row
+      virtualizer. Re-exporting from the package root for convenience.
+    diff_file: diffs/V-04.diff
+    ground_truth:
+      decision: FLAG
+      category: violation
+      claim: ADR004
+      why: >
+        Root index re-exports deep internal paths, bypassing two levels of
+        index files — the exact untraceability ADR004 exists to prevent, on a
+        public API surface. Deliberate (stated), medium-high blast radius.
+
+  - id: V-05
+    title: "Add cell formatters to table columns module"
+    author: "@frontend-dev-7"
+    labels: []
+    description: >
+      Column consumers kept importing formatters separately; re-exporting
+      them from columns.ts for convenience.
+    diff_file: diffs/V-05.diff
+    ground_truth:
+      decision: FLAG
+      category: violation
+      claim: ADR004
+      why: >
+        A non-index module (columns.ts) now contains re-exports, which ADR004
+        forbids. Subtle — this is the hard case: small diff, plausible-looking,
+        but it breaks export traceability. A detector that catches this without
+        drowning in noise is the aspiration; missing it below the confidence
+        threshold is an acceptable, documented cost of precision-first tuning.
+
+  - id: N-01
+    title: "Lazy-load the TechDocs reader page"
+    author: "@frontend-dev-7"
+    labels: []
+    description: >
+      Code-splits the reader page to cut initial bundle size. Uses the
+      React.lazy adapter pattern from ADR003 plus a default export on the
+      route module as required by the loader.
+    diff_file: diffs/N-01.diff
+    ground_truth:
+      decision: SILENT
+      category: noise-lookalike
+      claim: ADR003
+      why: >
+        Contains a literal `export default` — a naive matcher flags it. But
+        React.lazy modules are ADR003's documented exception, and the PR uses
+        the ADR's own recommended adapter. Textbook false-positive shape.
+
+  - id: N-02
+    title: "Migrate jenkins-backend off axios to native fetch"
+    author: "@backend-dev-3"
+    labels: []
+    description: >
+      Removes the axios dependency per ADR014 and switches to native fetch.
+    diff_file: diffs/N-02.diff
+    ground_truth:
+      decision: SILENT
+      category: noise-lookalike
+      claim: ADR014
+      why: >
+        The diff is full of the string "axios" — but every occurrence is a
+        deletion. This PR is compliance in progress, not drift. Flagging it
+        would punish the exact behavior the ADR wants.
+
+  - id: N-03
+    title: "Add migration guide for React.FC removal"
+    author: "@docs-writer-1"
+    labels: ["documentation"]
+    description: >
+      Documentation for teams migrating legacy components per ADR006.
+    diff_file: diffs/N-03.diff
+    ground_truth:
+      decision: SILENT
+      category: noise-lookalike
+      claim: ADR006
+      why: >
+        React.FC appears only inside a markdown code block explicitly labeled
+        as the legacy pattern. Docs quoting a violation are not a violation.
+
+  - id: N-04
+    title: "Add canned search result fixture for list tests"
+    author: "@qa-dev-2"
+    labels: []
+    description: >
+      Small test fixture used by the SearchResultList unit tests.
+    diff_file: diffs/N-04.diff
+    ground_truth:
+      decision: SILENT
+      category: noise-lookalike
+      claim: ADR003
+      why: >
+        A real, technical violation (default export, no React.lazy exception)
+        — but one-off, trivial, zero blast radius, in a test fixture, and
+        mechanically fixable by the linter ADR003 says will be added. This is
+        the case that separates a judgment layer from a linter: high confidence
+        it violates, near-zero case it's worth an engineer's attention.
+
+  - id: G-01
+    title: "Work around undici proxy-agent gap in discovery"
+    author: "@backend-dev-3"
+    labels: []
+    description: >
+      OVERRIDE ADR014: native fetch (undici) does not honor HTTPS_PROXY for
+      this call path — see issue #24988. Adding node-fetch scoped to the
+      discovery entrypoint only, with a removal TODO tracked in #24990.
+      Discussed with @platform-lead in the issue thread.
+    diff_file: diffs/G-01.diff
+    ground_truth:
+      decision: SILENT
+      category: guardrail
+      claim: ADR014
+      why: >
+        Real violation shape, but the PR description explicitly references and
+        overrides the ADR with a tracked issue. Guardrail rule 1: documented
+        override → the system must not flag.
+
+  - id: G-02
+    title: "hotfix: restore pod list rendering (incident-4521)"
+    author: "@oncall-eng"
+    labels: ["hotfix", "incident"]
+    description: >
+      Incident-4521 regression fix. Includes a direct fetch stub in the test
+      because msw 1.x can't intercept the retry path; cleanup tracked post-incident.
+    diff_file: diffs/G-02.diff
+    ground_truth:
+      decision: SILENT
+      category: guardrail
+      claim: ADR007
+      why: >
+        Violation shape (manual fetch stub), but it's a labeled hotfix during
+        an incident. Guardrail rule 2: never second-guess incident response in
+        the moment. Follow-up belongs in the postmortem, not a PR flag.
+
+  - id: G-03
+    title: "Timezone-split labels for usage heatmap"
+    author: "@core-maintainer"
+    labels: []
+    description: >
+      Luxon can't express split-offset zone labels needed here (ADR010
+      follow-up: I'm scoping a narrow exception for date-fns-tz in this one
+      component; will amend the ADR this sprint).
+    diff_file: diffs/G-03.diff
+    ground_truth:
+      decision: SILENT
+      category: guardrail
+      claim: ADR010
+      why: >
+        Adds a non-Luxon date library — but the author IS the ADR010 author,
+        making an explicit, documented follow-up call about their own decision.
+        Guardrail rule 4: the decision's author amending their decision is
+        governance working, not drift.
+
+  - id: G-04
+    title: "Migrate proxy-backend to native fetch"
+    author: "@backend-dev-3"
+    labels: []
+    description: >
+      Drops node-fetch in favor of native fetch on Node 20+.
+    diff_file: diffs/G-04.diff
+    ground_truth:
+      decision: SILENT
+      category: guardrail
+      claim: ADR013
+      why: >
+        This PR "violates" ADR013 (use node-fetch) — but ADR013 was superseded
+        by ADR014, which this PR complies with. A detector that doesn't track
+        decision lifecycle enforces zombie rules. Guardrail rule 0: superseded
+        ADRs are never evaluated.
+
+  - id: C-01
+    title: "Add AnnouncementCard component"
+    author: "@frontend-dev-7"
+    labels: []
+    description: >
+      New card component for the announcements plugin.
+    diff_file: diffs/C-01.diff
+    ground_truth:
+      decision: SILENT
+      category: clean
+      claim: null
+      why: >
+        Fully compliant: Luxon for dates, named exports, proper index-file
+        re-export structure. The detector should have nothing to say.
+
+  - id: C-02
+    title: "Add AnnouncementsClient with msw-backed tests"
+    author: "@backend-dev-3"
+    labels: []
+    description: >
+      Backend client for the announcements API.
+    diff_file: diffs/C-02.diff
+    ground_truth:
+      decision: SILENT
+      category: clean
+      claim: null
+      why: >
+        Native fetch in backend code, msw for test mocking. Compliant with
+        ADR014 and ADR007; contains trigger-adjacent strings (fetch, msw)
+        that must not confuse the detector.

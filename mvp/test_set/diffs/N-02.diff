@@ -1,0 +1,29 @@
+diff --git a/plugins/jenkins-backend/package.json b/plugins/jenkins-backend/package.json
+index 123aaaa..456bbbb 100644
+--- a/plugins/jenkins-backend/package.json
++++ b/plugins/jenkins-backend/package.json
+@@ -25,7 +25,6 @@
+   "dependencies": {
+     "@backstage/backend-plugin-api": "workspace:^",
+-    "axios": "^0.27.2",
+     "express": "^4.17.1"
+   },
+diff --git a/plugins/jenkins-backend/src/service/JenkinsApi.ts b/plugins/jenkins-backend/src/service/JenkinsApi.ts
+index 789cccc..012dddd 100644
+--- a/plugins/jenkins-backend/src/service/JenkinsApi.ts
++++ b/plugins/jenkins-backend/src/service/JenkinsApi.ts
+@@ -1,15 +1,16 @@
+-import axios from 'axios';
+ import { ResponseError } from '@backstage/errors';
+
+ export class JenkinsApi {
+   async getBuilds(jobName: string) {
+-    const response = await axios.get(`${this.baseUrl}/job/${jobName}/api/json`);
+-    return response.data;
++    const response = await fetch(`${this.baseUrl}/job/${jobName}/api/json`);
++    if (!response.ok) {
++      throw await ResponseError.fromResponse(response);
++    }
++    return await response.json();
+   }
+ }
