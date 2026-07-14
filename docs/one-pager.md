@@ -1,8 +1,5 @@
 # One-Pager: Drift Detection as a Code-Review-Assistant Feature
 
-> **Status: structured draft.** Numbers and structure are real; `[YOUR VOICE]`
-> markers need your positioning choices.
-
 ## Where it lives
 
 A feature inside an existing code review assistant (the natural hosts: GitHub's
@@ -11,10 +8,12 @@ team's PR tooling) — **not** a standalone product. Distribution and trust are
 the whole game for a tool whose value is speaking rarely; it should ride inside
 something engineers already accepted into their PRs.
 
-`[YOUR VOICE]` — pick the one host you'd actually pitch and say why. (My
-default: an internal platform team's PR bot, because the buyer — a platform
-lead losing sleep over dependency sprawl — is also the ADR author, and pilot
-access is a conversation, not a sales cycle.)
+My pick: an internal platform team's PR bot. The buyer — a platform lead
+losing sleep over dependency sprawl — is the same person who wrote the ADRs,
+so the tool's judgment is calibrated against its own customer's, and pilot
+access is a conversation, not a sales cycle. The commercial code-review
+assistants are the expansion path once the usefulness rate has proof behind
+it, not the entry point.
 
 ## The user and the moment
 
@@ -53,6 +52,8 @@ precision-first tuning. Full run: `results/run-report.md`.
 
 ## What I'd need to believe to invest further
 
-`[YOUR VOICE]` — your honest bar. (Suggested: the shadow-mode usefulness rate
-holding on a *second* team's ADR corpus, because generalizing across decision-
-writing styles is this product's biggest unproven assumption.)
+The usefulness rate holding at ≥70% on a *second* team's ADR corpus. One team
+proves the pilot team's decisions were extractable; two teams start to prove
+the approach generalizes across decision-writing styles — which is this
+product's biggest unproven assumption. Everything else (better prompts, more
+guardrails, UI) is spend that should wait behind that answer.

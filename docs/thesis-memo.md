@@ -1,9 +1,5 @@
 # Product Thesis: Architecture Decisions Die the Moment the ADR Is Merged
 
-> **Status: structured draft.** The argument and evidence are in place; sections
-> marked `[YOUR VOICE]` need your own experience and phrasing before this ships
-> to the portfolio — this memo is the piece interviewers will probe hardest.
-
 ## The bet
 
 Teams don't lack architecture decisions — they lack any mechanism that notices
@@ -34,9 +30,19 @@ new dependency the exact sprawl we consolidated away?). And when a lint rule is
 inconvenient mid-deadline, it gets `// eslint-disable`d — the drift now carries
 an explicit marker of contempt for the rule.
 
-`[YOUR VOICE]` — add one concrete story from your own experience of drift
-discovered too late (an incident, an audit surprise, a "we have three HTTP
-clients?" moment). This paragraph is what makes the memo yours.
+I've watched this exact failure shape outside of code. At IQVIA, client
+engagements start with a data specification everyone signs — which patient
+universe, which projection methodology, how a "treated patient" is counted.
+That spec is the ADR. Then monthly deliverables ship for two quarters, teams
+rotate, and small interpretation choices accumulate quietly: a filter applied
+slightly differently, a definition "improved" without anyone re-reading the
+signed spec. Nobody notices — each deliverable looks internally consistent —
+until the client's own QC tries to reconcile Q1 against Q3 and the numbers
+don't tie out. What follows is weeks of re-baselining and, worse, a client now
+double-checking everything we send. The spec didn't fail; the absence of
+anything *re-reading deliverables against the spec* failed. That gap — between
+a signed decision and its slow, invisible erosion — is the same product
+problem this tool attacks, pointed at a codebase instead of a data deliverable.
 
 ## The counter-case, in full (steelman before rebuttal)
 
@@ -60,9 +66,14 @@ An engineering team's honest objections:
    that report ("ADR010 has been overridden 4 times this quarter") aimed at the
    architecture owner, not PR authors.
 
-`[YOUR VOICE]` — which of these objections do you find most convincing, and
-would you actually concede more? Interviewers respect a position held with
-visible cost.
+Of the three, I concede the most ground to the third. Repeated drift against
+one decision usually means the decision is losing the argument, not the
+engineers — and a tool that keeps flagging PR authors in that situation is
+enforcing a rule the team has already voted down with their keyboards. That's
+why the roadmap's first real addition isn't better detection, it's the
+per-ADR override report: when a decision gets deviated from four times in a
+quarter, the flag should go to the decision's owner, phrased as "your ADR may
+be stale," not to a fifth engineer.
 
 ## Why calibrated judgment is a different bet
 
